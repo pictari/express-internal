@@ -6,9 +6,11 @@ import { ContentType } from "../models/orm/common_enums";
 import Joi from "joi";
 import { ValidateGame } from "../models/rest/game_entity";
 import { ValidateEntry } from "../models/rest/entry_entity";
+import { Account } from "../models/orm/account";
 
 const brokentelRepo = AccountDataSource.getRepository(BrokenTelephoneGame);
 const brokentelEntryRepo = AccountDataSource.getRepository(BrokenTelephoneEntry);
+const accountRepo = AccountDataSource.getRepository(Account);
 
 export const postNewGame = async (req: Request, res: Response) => {
 
@@ -67,5 +69,36 @@ export const postNewEntry = async (req: Request, res: Response) => {
             console.log(`Error: ${error}`);
         }
         res.status(500).send(`Couldn't create a new entry.`);
+    }
+}
+
+export const putGameStatistics = async (req: Request, res: Response) => {
+    let uuid = req.params.uuid;
+    if(uuid == undefined || uuid == null) {
+        res.status(400).send(`Bad UUID.`);
+        return;
+    }
+
+    let fetchedAccount = await accountRepo.findOneBy({uuid: uuid});
+    if(fetchedAccount == null) {
+        res.status(404).send(`No such account.`);
+        return;
+    }
+
+    try {
+        if(fetchedAccount.gamesPlayed == null) {
+            fetchedAccount.gamesPlayed = 0;
+        }
+        fetchedAccount.gamesPlayed += 1;
+        AccountDataSource.manager.save(fetchedAccount);
+        res.status(204).send(`Update successful.`);
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log(`Issue updating statistics: ${error.message}`);
+        }
+        else {
+            console.log(`Error: ${error}`);
+        }
+        res.status(500).send(`Couldn't update that account's statistics.`);
     }
 }
