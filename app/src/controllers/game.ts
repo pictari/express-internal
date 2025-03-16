@@ -18,6 +18,7 @@ export const postNewGame = async (req: Request, res: Response) => {
     let validationResult: Joi.ValidationResult = ValidateGame(body);
 
     if (validationResult.error) {
+        console.log("Failed to validate a game: " + validationResult.error);
         res.status(400).json(validationResult.error);
         return;
     }
@@ -45,6 +46,7 @@ export const postNewEntry = async (req: Request, res: Response) => {
     let validationResult: Joi.ValidationResult = ValidateEntry(body);
 
     if (validationResult.error) {
+        console.log("Failed to validate an entry: " + validationResult.error);
         res.status(400).json(validationResult.error);
         return;
     }
