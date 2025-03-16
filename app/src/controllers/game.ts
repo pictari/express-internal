@@ -26,8 +26,8 @@ export const postNewGame = async (req: Request, res: Response) => {
         let newGame : BrokenTelephoneGame = new BrokenTelephoneGame();
         newGame.accountUuid = body.uuid;
 
-        let returnedId = (await brokentelRepo.insert(newGame)).identifiers[0].id;
-        res.status(201).json(`{"new":${returnedId}}`);
+        let returnedId = (await brokentelRepo.insert(newGame)).identifiers[0].gameId;
+        res.status(201).send(`{"new":${returnedId}}`);
     } catch (error) {
         if (error instanceof Error) {
             console.log(`Issue creating new game: ${error.message}`);
